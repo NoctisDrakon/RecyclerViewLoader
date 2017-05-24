@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LibraryTest</string>
+    <string name="acommodation_title_rv">Alojamiento</string>
+    <string name="euro_format">$%1$s</string>
+</resources>
