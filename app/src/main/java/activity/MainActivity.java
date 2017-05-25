@@ -20,6 +20,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = "MainActivity";
     RecyclerViewLoader rvLoader;
+    List<Item> dataSet = new ArrayList<>();
+    private ItemsAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +33,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .setRefreshStructure(null)
                 .withEndlessScroll(2);
 
-        rvLoader.setRVAdapter(new ItemsAdapter(createDummies(), getApplicationContext(),
-                this, "holi"));
+
+        dataSet.addAll(createDummies());
+        adapter = new ItemsAdapter(dataSet, getApplicationContext(), this, "holi");
+        rvLoader.setRVAdapter(adapter);
 
     }
 
     private List<Item> createDummies() {
         List<Item> list = new ArrayList<>();
-
         list.add(new Item());
         list.add(new Item("Viaje en Kayak", "450", "https://www.seatrek.com/wp-content/uploads/2016/10/Traditional-Sea-Kayak-3.jpg", 4));
         list.add(new Item("Alpinismo extremo", "900", "https://thenypost.files.wordpress.com/2014/06/shutterstock_145698575.jpg", 4));
@@ -62,5 +65,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onRefreshEvent(int type) {
         Log.d(TAG, "onRefreshEvent: REFRESH EVENT!!! " + (type == REFRESH ? "REFRESH" : "RELOAD"));
+        switch (type) {
+            case REFRESH:
+                dataSet.addAll(createDummies());
+
+                rvLoader.post(new Runnable() {
+                    public void run() {
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+                break;
+
+            case RELOAD:
+                dataSet.clear();
+                dataSet.addAll(createDummies());
+                adapter.notifyDataSetChanged();
+                rvLoader.setRefeshLayoutLoading(false);
+                break;
+        }
     }
 }
